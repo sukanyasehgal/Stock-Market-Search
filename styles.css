@@ -1,0 +1,64 @@
+.asterisk {
+    color: red;
+}
+
+a:hover {
+ cursor:pointer;
+}
+
+.star {
+    color: rgb(205, 170, 57);
+}
+
+.bold {
+    font-weight: 700;
+}
+
+.red {
+    color: red;
+}
+
+.green {
+    color: green;
+}
+
+.trashBtn {
+    
+}
+
+.quoteDetailsHide {
+    display: none;
+}
+
+.quoteDetailsShow {
+    display: "";
+}
+
+.favHide {
+    display: none;
+}
+
+.favShow {
+    display: "";
+}
+
+.wellColor {
+    background-color: white;
+}
+
+.symbolRowClass {
+    color: blue;
+    cursor: pointer;
+}
+
+.symbolRowClass:hover {
+    text-decoration: underline;
+}
+
+.main-heading {
+    font-size: 18px;
+}
+
+.checker {
+    
+}

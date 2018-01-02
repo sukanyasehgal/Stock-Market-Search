@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title></title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic">
+  <link rel='stylesheet prefetch' href='https://cdn.gitcdn.xyz/cdn/angular/bower-material/v1.0.0-rc4/angular-material.css'>
+  <link rel="stylesheet" href="styles.css"> 
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+  
+</head>
+<body style = "background-image: url('http://cs-server.usc.edu:45678/hw/hw8/images/background.png'); height: 200%" ng-app="MyApp" ng-controller = "DemoCtrl">
+ 
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.js"></script>
+<script src="https://code.highcharts.com/stock/highstock.js"></script>
+<script src="http://code.highcharts.com/modules/exporting.js"></script>
+<script src='https://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular.js'></script>
+<script src='https://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular-animate.min.js'></script>
+<script src='https://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular-route.min.js'></script>
+<script src='https://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular-aria.min.js'></script>
+<script src='https://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular-messages.min.js'></script>
+<script src='https://cdn.gitcdn.xyz/cdn/angular/bower-material/v1.0.0-rc4/angular-material.js'></script>
+<script src='https://s3-us-west-2.amazonaws.com/s.cdpn.io/t-114/assets-cache.js'></script> 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/moment.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.14/moment-timezone-with-data.min.js"></script>
+<script src="frontendScript.js"></script>
+
+<div class = "row">
+    <div class = "col-lg-2"></div>
+    <div class = "col-lg-8" style = "padding: 0px; margin-top: 7px">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div><p style = "text-align: center" class = "bold main-heading">Stock Market Search</p></div>
+                
+                    <form class="form-inline">
+                            <div class="autocompletedemoFloatingLabel" ng-controller="DemoCtrl as ctrl" layout="column" ng-cloak="">
+                            <md-content class="md-padding">
+                            <form name="searchForm" ng-submit="$event.preventDefault()">
+                            <div class = "row">
+                                
+                                <div class = "col-md-4">
+                                    <label for="ticker_symbol">
+                                        Enter Stock Ticker Symbol:<span class = "asterisk">*</span>
+                                    </label>
+                                </div>
+                                <div class = "col-md-4">
+                                <md-autocomplete 
+                                flex="" 
+                                md-item-text="item.Symbol"
+                                md-items="item in ctrl.querySearch(ctrl.searchText)" 
+                                md-search-text="ctrl.searchText" 
+                                md-selected-item="ctrl.selectedItem" 
+                                md-no-cache="ctrl.noCache" 
+                                md-input-maxlength="30" 
+                                md-input-minlength="2" 
+                                md-input-name="autocompleteField" 
+                                >
+                                <md-item-template>
+                                    <span md-highlight-text="ctrl.searchText">{{item.Symbol + " - " + item.Name + " (" + item.Exchange + ")"}}</span>
+                                </md-item-template>
+                                <div ng-messages="searchForm.autocompleteField.$error" ng-if="searchForm.autocompleteField.$touched">
+                                </div>
+                                </md-autocomplete>
+                                    
+                                <div id = "userMssg"></div>
+                                    
+                                </div>
+                                <div class = "col-md-4">
+                                    <button id = "getQuoteBtn" type="button" class="btn btn-primary" disabled><i class="glyphicon glyphicon-search"></i>&nbsp;Get Quote
+                                    </button>
+                                    <button id = "clear" class="btn btn-default"><i class="glyphicon glyphicon-refresh"></i>&nbsp;Clear</button>
+                                </div>
+                               
+                            </div>
+                            
+                            </form>
+                                
+                           </md-content>
+                            </div>   
+                    </form>
+             </div>
+        </div>
+        <hr>  
+       </div>
+    </div>
+    
+    <div id = "favDetails" class = "row favShow">
+        <div class = "col-lg-2"></div>
+            <div class = "col-lg-8 well wellColor">
+               <div class="panel panel-default">
+                   <div class="panel-heading bold">Favorite List
+                       <div  style ="float: right">  
+                       <label><span>Automatic Refresh:  
+                           </span></label>  
+                           <div class="checkbox checkbox-inline" style = "margin: 0"><span>
+                               <input id = "autoRefresh" type="checkbox" data-toggle="toggle"></span>
+                           </div>
+                            <button id = "manRefresh" type="button" class="btn btn-default btn-sm">
+                            <span class="glyphicon glyphicon-refresh"></span>
+                            </button>
+                            <button id = "slideRtBtn" type="button" class="btn btn-default btn-sm" disabled ng-click = "showStockDetails()">
+                            <span class="glyphicon glyphicon-chevron-right"></span>
+                            </button>
+                      </div>
+                       <div style="clear:right"></div>
+                   </div>
+                   
+                   <div class="panel-body">
+                       <div class = "row">
+                       <span class = "bold col-lg-2 col-md-2 col-xs-12">Sort by</span>
+                           <span class = "col-md-3 col-xs-12">
+                               <select id = "sortByMenu">
+                                <option value="Default">Default</option>
+                                <option value="Symbol">Symbol</option>
+                                <option value="Price">Price</option>
+                                <option value="Change">Change</option>
+                                <option value="Change Percent">Change Percent</option>
+                                <option value="Volume">Volume</option>
+                                </select>
+                           </span>
+                       
+                           <span class = "bold col-lg-2 col-md-2 col-xs-12">Order</span>
+                           <span class = "col-md-3 col-xs-12">
+                               <select id = "orderTypeMenu" disabled>
+                                   <option value="Ascending">Ascending</option>
+                                   <option value="Descending">Descending</option>
+                               </select>
+                           </span>
+                     
+                       </div>
+                       <div class = "table-responsive"> 
+                           <table id = "favTable" class='table table-striped'>
+                               <thead class = "bold">
+                                   <tr>
+                                       <td>Symbol</td>
+                                       <td>Stock Price</td>
+                                       <td>Change (Change Percent)</td>
+                                       <td>Volume</td>
+                                   </tr>
+                               </thead>
+                               <tbody id = "favTableBody">
+                               </tbody>
+                           </table>
+                       </div>
+                   </div>
+                </div>
+            </div>
+    </div>
+    
+    <div id = "quoteDetails" class = "row quoteDetailsHide">
+        <div class = "col-lg-2"></div>
+            <div class = "col-lg-8 well wellColor">
+                <div class="panel panel-default">
+                    <div class="panel-heading bold" align = "center">
+                        <button id = "slideLftBtn" type="button" class="btn btn-default btn-sm" style = "float: left" ng-click = "showFavData()">
+                        <span class="glyphicon glyphicon-chevron-left"></span>
+                        </button>Stock Details
+                    </div> 
+                <div class="panel-body">
+                <ul class="nav nav-pills">
+                    <li class="active"><a data-toggle="pill" href="#stockDetailsDiv"><span class = "glyphicon glyphicon-dashboard"></span>&nbsp;Current Stock</a></li>
+                    <li><a data-toggle="pill" href="#hisChartsDiv"><span class = "glyphicon glyphicon-stats"></span>&nbsp;Historical Charts</a></li>
+                    <li><a data-toggle="pill" href="#newsFeedDiv"><span class = "glyphicon glyphicon-link"></span>&nbsp;News Feed</a></li>
+                </ul>
+                    
+                <hr>
+                
+                <div class = "row border: solid">
+                    <div class="tab-content">
+                    <div id="stockDetailsDiv" class="tab-pane fade in active col-sm-12">
+                        <div class = "col-sm-6">
+                            <div id="fb-root"></div>  
+                            <div>
+                               <span class = "bold">Stock Details
+                               </span>
+                                
+                                <div style= "float: right">
+                                    <button id = "favBtnDiv" type="button" class="btn btn-default btn-sm" disabled>
+                                    <span id = "favBtn" class="glyphicon glyphicon-star-empty"></span> 
+                                    </button>
+                              
+                                    <button id = "fbBtnDiv" type="button" class="btn btn-default btn-sm" disabled>
+                                    <img id = "fbBtn" style = "height: 17.5px; width: 14px" src = "http://cs-server.usc.edu:45678/hw/hw8/images/facebook.png"> 
+                                    </button>
+                                </div>
+                                <div style = "clear:right"></div>
+                            </div>
+                            <div class = "table-responsive" id = "stockTableDiv">
+                            </div>
+                        </div>
+                        <div class = "col-sm-6">
+                            <ul class="nav nav-tabs">
+                                <li class="active"><a data-toggle="tab" href="#Price">Price</a></li>
+                                <li><a data-toggle="tab" href="#SMA">SMA</a></li>
+                                <li><a data-toggle="tab" href="#EMA">EMA</a></li>
+                                <li><a data-toggle="tab" href="#STOCH">STOCH</a></li>
+                                <li><a data-toggle="tab" href="#RSI">RSI</a></li>
+                                <li><a data-toggle="tab" href="#ADX">ADX</a></li>
+                                <li><a data-toggle="tab" href="#CCI">CCI</a></li>
+                                <li><a data-toggle="tab" href="#BBANDS">BBANDS</a> </li>
+                                <li><a data-toggle="tab" href="#MACD">MACD</a></li>
+                            </ul>
+                            <br><br>
+                            <div class = "tab-content">
+                                <div id="Price" class="tab-pane fade in active checker"></div>
+                                <div id="SMA" class="tab-pane fade checker"></div>
+                                <div id="EMA" class="tab-pane fade checker"></div>
+                                <div id="CCI" class="tab-pane fade checker"></div>
+                                <div id="RSI" class="tab-pane fade checker"></div>
+                                <div id="ADX" class="tab-pane fade checker"></div>
+                                <div id="STOCH" class="tab-pane fade checker"></div>
+                                <div id="BBANDS" class="tab-pane fade checker"></div>
+                                <div id="MACD" class="tab-pane fade checker"></div>
+                            </div>
+                        </div>
+                    </div>
+                        
+                    <div id="hisChartsDiv" class="tab-pane fade col-sm-12"></div>
+                        
+                    <div id="newsFeedDiv" class="tab-pane fade col-sm-12"></div>
+                    </div>
+                    
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> 
+</body>
+</html>
